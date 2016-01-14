@@ -4,24 +4,27 @@
 (defn menu [{data :data}]
   [:div#menu
    [:$style
-    [:#menu {:border-bottom "1px solid #ddd"
-             :border-bottom-color [:$c :gray]}
+    [:#menu {:border-bottom {:width [:$px 1]
+                             :style "solid"
+                             :color [:$c :gray]}}
      [:.item {:display "inline-block"
-              :padding  [:$px 10]
-              :font-size [:$v 2]
+              :padding     [:$px 10]
+              :font-size   [:$v 2]
               :line-height [:$v 3]}
-      [:.icon {:height [:$v 3]
-               :width [:$v 3]
+
+      [:.icon {:height  [:$v 3]
+               :width   [:$v 3]
                :display "inline-block"}
+
        [:.logo {:fill "none"
                 :stroke [:$c :red]
                 :stroke-width 3}]]]]]
-   [:a.item
+   [:a.item {:href "#"}
     [:.icon [:$svg "icon"]]
-    " "
+    [:$nbsp]
     (get-in data [:texts :brand])]
    (for [it (:menu data)]
-     [:a.item (:title it)])])
+     [:a.item {:href "#"} (:title it)])])
 
 (defn layout [{data :data :as opts} cnt]
   [:html
@@ -29,11 +32,12 @@
     [:$cdn-css :bootsrtrap]
     [:$google-font :Exo-2]
     [:$style
-     [:body {:padding "50px"
+     [:body {:padding [:$v 2]
              :font-family "'Exo 2'"}]]]
    [:body
     [:.container
      (menu opts)
+     [:$br 10]
      cnt]]])
 
 (defn index [{data :data :as opts}]

@@ -52,11 +52,20 @@
   ([opts data & ks] (inspect-data opts (get-in data ks))))
 
 
+(defn br [opts & [x]]
+  [:div {:style (garden/style
+                 {:height
+                  (units/px*
+                   (or (get-in opts [:styles :$v]) 18)
+                   (or x 1))})}])
+
 (def pre-rules
   {:$style style
    :$svg svg
    :$cdn-css cdn-css
    :$inspect inspect-data
+   :$nbsp (fn [& _] "&nbsp;")
+   :$br br
    :$google-font google-font})
 
 (defn pre-process [opts hic]
