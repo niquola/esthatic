@@ -1,0 +1,10 @@
+language: clojure
+lein: lein2
+script: bash build.sh
+cache:
+  directories:
+    - $HOME/.m2
+jdk:
+ - oraclejdk8
+before_install:
+  - mkdir -p secure && openssl aes-256-cbc -K $encrypted_bd152f8afbb8_key -iv $encrypted_bd152f8afbb8_iv -in key.enc -out secure/key -d
