@@ -7,6 +7,7 @@
             [org.httpkit.server :as srv]
             [esthatic.data :as data]
             [esthatic.bootstrap :as bootstrap]
+            [esthatic.generator :as gen]
             [garden.core :as garden]
             [garden.units :as units]
             [clojure.walk :as walk]
@@ -120,26 +121,16 @@
         (http opts (layout req ((:match mtch) req))))
       {:body "ups" :method 404})))
 
+(defn mk-handler [{routes :routes port :port :as opts}]
+  (-> (mk-dispatch opts)
+      (rmr/wrap-resource "assets")
+      (rmd/wrap-defaults rmd/site-defaults)))
+
 (defn start [{routes :routes port :port :as opts}]
-  (let [app (-> (mk-dispatch opts)
-                (rmr/wrap-resource "assets")
-                (rmd/wrap-defaults rmd/site-defaults))]
-    (srv/run-server app {:port (or port 8080)})))
+  (srv/run-server (mk-handler opts) {:port (or port 8080)}))
 
-(comment
+(defn generate [config]
+  (gen/generate
+   (assoc config :dispatch (mk-handler config))))
 
-  (defn layout [req cnt]
-    [:html
-     [:body
-      [:h1 "Layout"]
-      cnt]])
-
-  (defn index [req]
-    [:h3 "Hello"])
-
-  (def stop
-    (start {:routes {:GET index}
-            :layout layout}))
-  (stop)
-  )
 
