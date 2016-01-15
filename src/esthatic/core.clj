@@ -6,6 +6,7 @@
             [hiccup.core :refer [html]]
             [org.httpkit.server :as srv]
             [esthatic.data :as data]
+            [esthatic.bootstrap :as bootstrap]
             [garden.core :as garden]
             [garden.units :as units]
             [clojure.walk :as walk]
@@ -14,22 +15,45 @@
 (defn svg [opts path]
   (slurp (str  "resources/assets/" (name path) ".svg")))
 
+(defn $c [opts x]
+  (let [styles (deref (:styles opts))]
+    (get-in styles [:$c x])))
+
+(defn $px [opts x] (units/px* x))
+
+(defn $v [opts x]
+  (let [styles (deref (:styles opts))]
+    (units/px* x (or (get-in styles [:$v]) 18))))
+
+(defn $border [opts & keys]
+  (let [styles (deref (:styles opts))]
+    (reduce
+     (fn [acc k]
+       (cond
+         (number? k) (assoc acc :width ($px opts k))
+         (keyword? k) (assoc acc :color ($c opts k))))
+     {:style "solid"}
+     keys)))
 
 (def css-rules
-  {:$v (fn [opts x] (units/px* x (or (get-in opts [:styles :$v])
-                                     18)))
-   :$px (fn [opts x] (units/px* x))
-   :$c (fn [opts x] (get-in opts [:styles :$c x]))})
+  {:$v $v
+   :$px $px
+   :$border $border
+   :$c $c})
 
 (defn css-process [opts grdn]
+  (println "css" opts)
   (walk/prewalk (fn [x]
                   (if-let [h (and (vector? x) (get css-rules (first x)))]
                     (apply h opts (rest x))
                     x))
                 grdn))
 
+
 (defn style [opts garden-rules]
-  [:style {:type "text/css"} (garden/css (css-process opts garden-rules))])
+  (println "Style")
+  [:style {:type "text/css"}
+   (garden/css (css-process opts garden-rules))])
 
 (def css-s
   {:bootsrtrap "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"})
@@ -62,6 +86,8 @@
 (def pre-rules
   {:$style style
    :$svg svg
+   :$nav bootstrap/nav
+   :$nav-item bootstrap/nav-item
    :$cdn-css cdn-css
    :$inspect inspect-data
    :$nbsp (fn [& _] "&nbsp;")

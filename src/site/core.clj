@@ -37,7 +37,6 @@
    [:body
     [:.container
      (menu opts)
-     [:$br 10]
      cnt]]])
 
 (defn index [{data :data :as opts}]
