@@ -1,5 +1,6 @@
 (ns esthatic.core
   (:require [clojure.string :as str]
+            [gardner.core :as css]
             [hiccup.page :as hp]
             [ring.middleware.resource :as rmr]
             [ring.middleware.defaults :as rmd]
@@ -11,50 +12,18 @@
             [garden.core :as garden]
             [garden.units :as units]
             [clojure.walk :as walk]
-            [route-map.core :as rt]))
+            [route-map.core :as rt]
+            [markdown.core :as md]))
 
 (defn svg [opts path]
   (slurp (str  "resources/assets/" (name path) ".svg")))
 
-(defn $c [opts x]
-  (let [styles (deref (:styles opts))]
-    (get-in styles [:$c x])))
-
-(defn $px [opts x] (units/px* x))
-
-(defn $v [opts x]
-  (let [styles (deref (:styles opts))]
-    (units/px* x (or (get-in styles [:$v]) 18))))
-
-(defn $border [opts & keys]
-  (let [styles (deref (:styles opts))]
-    (reduce
-     (fn [acc k]
-       (cond
-         (number? k) (assoc acc :width ($px opts k))
-         (keyword? k) (assoc acc :color ($c opts k))))
-     {:style "solid"}
-     keys)))
-
-(def css-rules
-  {:$v $v
-   :$px $px
-   :$border $border
-   :$c $c})
-
-(defn css-process [opts grdn]
-  (println "css" opts)
-  (walk/prewalk (fn [x]
-                  (if-let [h (and (vector? x) (get css-rules (first x)))]
-                    (apply h opts (rest x))
-                    x))
-                grdn))
-
+(defn markdown [opts str]
+  (md/md-to-html-string str))
 
 (defn style [opts garden-rules]
-  (println "Style")
   [:style {:type "text/css"}
-   (garden/css (css-process opts garden-rules))])
+   (css/css garden-rules)])
 
 (def css-s
   {:bootsrtrap "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"})
@@ -87,6 +56,7 @@
 (def pre-rules
   {:$style style
    :$svg svg
+   :$md markdown
    :$nav bootstrap/nav
    :$nav-item bootstrap/nav-item
    :$cdn-css cdn-css
@@ -97,7 +67,6 @@
 
 (defn pre-process [opts hic]
   (walk/prewalk (fn [x]
-                  (println x)
                   (if-let [h (and (vector? x) (get pre-rules (first x)))]
                     (apply h opts (conj (rest x)))
                     (if (and (vector? x) (.startsWith (name (first x)) "."))
@@ -127,10 +96,9 @@
       (rmd/wrap-defaults rmd/site-defaults)))
 
 (defn start [{routes :routes port :port :as opts}]
+  (css/config (:styles opts))
   (srv/run-server (mk-handler opts) {:port (or port 8080)}))
 
 (defn generate [config]
   (gen/generate
    (assoc config :dispatch (mk-handler config))))
-
-
