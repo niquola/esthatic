@@ -10,6 +10,7 @@
                  [route-map "0.0.2"]
                  [garden "1.3.0"]
                  [ring "1.4.0"]
+                 [dali "0.7.0"]
                  [ring/ring-defaults "0.1.5"]
                  [circleci/clj-yaml "0.5.5"]
                  [me.raynes/fs "1.4.6"]]

@@ -11,11 +11,10 @@
     (fs/mkdir dir-path)
     (spit fl-path res)))
 
-(defn safe-dispatch [& args]
-  )
+(defn safe-dispatch [& args])
 
 (defn *generate [{path :path params :params} {routes :routes :as config}]
-  (doseq [[k v] routes]
+  (doseq [[k v] (if (var? routes) (var-get routes) routes)]
     (println path k)
     (cond
       (= :GET k) (let [uri (str/join "/" path)

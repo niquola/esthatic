@@ -22,6 +22,7 @@
   (md/md-to-html-string str))
 
 (defn style [opts garden-rules]
+  (css/config (let [cfg (:styles opts)] (if (var? cfg) (var-get cfg) cfg)))
   [:style {:type "text/css"}
    (css/css garden-rules)])
 
@@ -71,8 +72,7 @@
                     (apply h opts (conj (rest x)))
                     (if (and (vector? x) (.startsWith (name (first x)) "."))
                       (into [(keyword (str "div" (name (first x))))] (rest x))
-                      x)
-                    ))
+                      x)))
                 hic))
 
 (defn http [opts hic]
@@ -93,7 +93,7 @@
 (defn mk-handler [{routes :routes port :port :as opts}]
   (-> (mk-dispatch opts)
       (rmr/wrap-resource "assets")
-      (rmd/wrap-defaults rmd/site-defaults)))
+      (rmd/wrap-defaults (merge rmd/site-defaults {:security {:anti-forgery false}}))))
 
 (defn start [{routes :routes port :port :as opts}]
   (css/config (:styles opts))

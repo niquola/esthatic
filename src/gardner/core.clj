@@ -43,7 +43,9 @@
                :bottom   (when b (u/px* v b))
                :right    (when r (u/px* h r))}})))
 
-(defn &c [x] (or (get @colors x) (name x)))
+(defn &c [x]
+  (or (get @colors x) (throw (Exception. (str "Do not know color " x " only " @colors)))))
+
 (defn &v [x] (and x (u/px* (get @vars :v) x)))
 (defn &h [x] (and x (u/px* (get @vars :h) x)))
 (defn &b [x] (and x (get b x)))
@@ -61,7 +63,20 @@
 (defn $text
   ([s] {:font-size (&v s)})
   ([s l] {:font-size (&v s) :line-height (&v l)})
-  ([s l a] {:font-size (&v s) :line-height (&v l) :text-align a}))
+  ([s l & args]
+   (let [props {:left :text-align
+                :right :text-align
+                :center :text-align
+                :uppercase :text-transform
+                :baseline :vertical-align
+                :bold :font-weight
+                :normal :font-weight}]
+     (reduce (fn [acc k]
+               (cond
+                 (number? k) (assoc acc :font-weight k)
+                 (get props k) (assoc acc (get props k) (name k))
+                 :else (throw (Exception. (str "Do not know " k)))))
+             {:font-size (&v s) :line-height (&v l)} args))))
 
 (defn &border
   ([width color]
@@ -197,10 +212,13 @@
   (prefix/autoprefix
     (garden/css (pre-process grdn))))
 
-(defn config [{vs :vars cs :colors ms :macros}]
-  (when vs (swap! vars merge vs))
-  (when cs (swap! colors merge cs))
-  (when ms (swap! macros merge ms)))
+(defn resolve-var [v] (if (var? v) (var-get v) v))
+
+(defn config [{vs :vars cs :colors ms :macros :as opts}]
+  (println "Configure " opts)
+  (when vs (swap! vars merge (resolve-var vs)))
+  (when cs (swap! colors merge (resolve-var cs)))
+  (when ms (swap! macros merge (resolve-var ms))))
 
 (comment 
   (css [:body {:$color [:red :blue]
