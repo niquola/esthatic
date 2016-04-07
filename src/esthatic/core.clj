@@ -88,7 +88,7 @@
         lang (if *lang* (str (name *lang*) "/") "")
         params (if (map? last) last {})
         hash (if (map? last) (:# last) nil)]
-    (str root lang (str/join "/" path) ".html" (when hash (str "#" hash)))))
+    (str root lang (str/join "/" path) (if (re-matches #"^.*\..*$" last) "" ".html") (when hash (str "#" hash)))))
 
 
 
