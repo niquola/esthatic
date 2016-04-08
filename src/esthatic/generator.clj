@@ -13,9 +13,11 @@
 
 (defn safe-dispatch [& args])
 
+(defn devar [v] (if (var? v) (var-get v) v))
+
 (defn *generate [{path :path params :params} {routes :routes :as config}]
-  (doseq [[k v] (if (var? routes) (var-get routes) routes)]
-    (println path k)
+  (doseq [[k v] (devar routes)]
+    (println path k v)
     (cond
       (= :GET k) (let [uri (str/join "/" path)
                        req {:uri uri :request-method k}
@@ -31,15 +33,14 @@
                     (doseq [pv (gen)]
                       (*generate {:path (conj path pv) :params (assoc params k pv)} v)))
       (keyword? k) "nop"
-      :else (*generate {:path (conj path k) :params params} v))))
+      :else (*generate {:path (conj path k) :params params} (assoc config :routes v)))))
 
 
 (defn generate [config]
   (println "Generating into dist:")
   (fs/delete-dir "dist")
   (fs/mkdir "dist")
-  (fs/copy "CNAME" "dist/CNAME")
-  (doseq [f (fs/glob "resources/assets/*")]
+  (doseq [f (fs/glob "resources/public/*")]
     (println "assets: " (fs/base-name f))
     ((if (fs/directory? f) fs/copy-dir fs/copy)
      (.getPath f) (str "dist/" (fs/base-name f))))

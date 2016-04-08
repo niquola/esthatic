@@ -215,7 +215,7 @@
 (defn resolve-var [v] (if (var? v) (var-get v) v))
 
 (defn config [{vs :vars cs :colors ms :macros :as opts}]
-  (println "Configure " opts)
+  #_(println "Configure " opts)
   (when vs (swap! vars merge (resolve-var vs)))
   (when cs (swap! colors merge (resolve-var cs)))
   (when ms (swap! macros merge (resolve-var ms))))
