@@ -171,7 +171,117 @@
     :$flex-basis  $flex-basis
     :&v &v
     :&h &h
-    :&c &c}))
+    :&c &c
+    :$fixed (fn [t r b l]
+              {:position "fixed"
+               :top    (when t (&v t))
+               :right  (when r (&h r))
+               :bottom (when b (&v b))
+               :left   (when l (&h l)) })
+    :$block-left (fn [w]
+                   {:position "fixed"
+                    :top 0 :bottom 0 :left 0
+                    :width (&h w)})
+
+    :$block-top (fn [h l r]
+                  {:position "fixed"
+                   :top 0
+                   :left   (&h l)
+                   :right  (&h r)
+                   :height (&v h)  })
+
+    :$circle (fn [] {:border-radius "50%" })
+
+    :$flex-full (fn [_] {:flex-grow 1})
+
+    :$flex-self-stretch (fn [] {:align-self "stretch"})
+
+
+    :$flex-column (fn
+                    ([] {:display ["flex" ]
+                         :justify-content "space-between"
+                         :flex-direction "column"
+                         :align-items "baseline"})
+                    ([a] {:display ["flex" ]
+                          :justify-content "space-between"
+                          :flex-direction "column"
+                          :align-items a})
+                    ([a j] {:display ["flex" ]
+                            :justify-content j
+                            :flex-direction "column"
+                            :align-items a}))
+
+    :$flex-row (fn
+                 ([]
+                  {:display "flex"
+                   :justify-content "space-between"
+                   :align-items "baseline"})
+                 ([a]
+                  {:display "flex"
+                   :justify-content "space-between"
+                   :align-items a})
+                 ([a j]
+                  {:display "flex"
+                   :justify-content j
+                   :align-items a})
+                 ([a j ac]
+                  {:display "flex"
+                   :justify-content j
+                   :align-items a
+                   :align-content ac }))
+
+    :$flex-row-left (fn []
+                      {:display "flex"
+                       :justify-content "flex-start"
+                       :align-items "baseline"})
+
+    :$center (fn []
+               {:display "flex"
+                :align-items "center"
+                :justify-content "center"
+                :flex-direction "column" } )
+
+    :$center-block (fn
+                     ([w] {:width (&h w)
+                           :height (&h w)
+                           :min-width (&h w)
+                           :min-height (&h w)
+                           :display "flex"
+                           :align-items "center"
+                           :justify-content "center"
+                           :flex-direction "column" })
+                     ([w h] {:width  (when w (&h w))
+                             :height (when h (&v h))
+                             :display "flex"
+                             :align-items "center"
+                             :justify-content "center"
+                             :flex-direction "column" }))
+
+:$box (fn
+        ([w] {:display "block"
+              :width  (&h w)
+              :height (&h w) })
+
+        ([w h] {:display "block"
+                :width  (when-not (= w nil) (&h w))
+                :height (when-not (= h nil) (&v h)) }) )
+
+:$block-main (fn [t r b l]
+               {:position "fixed"
+                :top    (&v t)
+                :right  (&h r)
+                :bottom (&v b)
+                :left   (&h l)})
+
+:$block-bottom (fn [h l r]
+                 {:position "fixed"
+                  :bottom 0
+                  :left   (&h l)
+                  :right  (&h r)
+                  :height (&v h)})
+:$cursor (fn [] {:cursor "pointer"})
+
+    }))
 
 (defn prop-macro? [x]
   (and (keyword? x) (re-find #"^\$" (name x))))
