@@ -31,7 +31,8 @@
                         gen (get routes k)]
                     (println gen)
                     (doseq [pv (gen)]
-                      (*generate {:path (conj path pv) :params (assoc params k pv)} v)))
+                      (println "Generate subpage:" path  pv)
+                      (*generate {:path (conj path pv) :params (assoc params k pv)} (assoc config :routes v))))
       (keyword? k) "nop"
       :else (*generate {:path (conj path k) :params params} (assoc config :routes v)))))
 
