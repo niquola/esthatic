@@ -146,116 +146,116 @@
 
 (def macros
   (atom
-   {:$padding $padding
-    :$margin  $margin
-    :$text $text
-    :&border &border
-    :$clear $clear
-    :$border $border
-    :$border-color $border-color
-    :$color $color
-    :$block $block
-    :$bg-color $bg-color
-    :$push-top $push-top
-    :$push-bottom $push-bottom
-    :$push-right $push-right
-    :$push-left $push-left
-    :$absolute $absolute
-    :$width $width
-    :$fill $fill
-    :$height $height
-    :$min-height $min-height
-    :$min-width $min-width
-    :$max-height $max-height
-    :$max-width  $max-width
-    :$flex-basis  $flex-basis
-    :&v &v
-    :&h &h
-    :&c &c
-    :$fixed (fn [t r b l]
-              {:position "fixed"
-               :top    (when t (&v t))
-               :right  (when r (&h r))
-               :bottom (when b (&v b))
-               :left   (when l (&h l)) })
-    :$block-left (fn [w]
+    {:$padding $padding
+     :$margin  $margin
+     :$text $text
+     :&border &border
+     :$clear $clear
+     :$border $border
+     :$border-color $border-color
+     :$color $color
+     :$block $block
+     :$bg-color $bg-color
+     :$push-top $push-top
+     :$push-bottom $push-bottom
+     :$push-right $push-right
+     :$push-left $push-left
+     :$absolute $absolute
+     :$width $width
+     :$fill $fill
+     :$height $height
+     :$min-height $min-height
+     :$min-width $min-width
+     :$max-height $max-height
+     :$max-width  $max-width
+     :$flex-basis  $flex-basis
+     :&v &v
+     :&h &h
+     :&c &c
+     :$fixed (fn [t r b l]
+               {:position "fixed"
+                :top    (when t (&v t))
+                :right  (when r (&h r))
+                :bottom (when b (&v b))
+                :left   (when l (&h l)) })
+     :$block-left (fn [w]
+                    {:position "fixed"
+                     :top 0 :bottom 0 :left 0
+                     :width (&h w)})
+
+     :$block-top (fn [h l r]
                    {:position "fixed"
-                    :top 0 :bottom 0 :left 0
-                    :width (&h w)})
+                    :top 0
+                    :left   (&h l)
+                    :right  (&h r)
+                    :height (&v h)  })
 
-    :$block-top (fn [h l r]
-                  {:position "fixed"
-                   :top 0
-                   :left   (&h l)
-                   :right  (&h r)
-                   :height (&v h)  })
+     :$circle (fn [] {:border-radius "50%" })
 
-    :$circle (fn [] {:border-radius "50%" })
+     :$flex-full (fn [_] {:flex-grow 1})
 
-    :$flex-full (fn [_] {:flex-grow 1})
-
-    :$flex-self-stretch (fn [] {:align-self "stretch"})
+     :$flex-self-stretch (fn [] {:align-self "stretch"})
 
 
-    :$flex-column (fn
-                    ([] {:display ["flex" ]
-                         :justify-content "space-between"
-                         :flex-direction "column"
-                         :align-items "baseline"})
-                    ([a] {:display ["flex" ]
+     :$flex-column (fn
+                     ([] {:display ["flex" ]
                           :justify-content "space-between"
                           :flex-direction "column"
-                          :align-items a})
-                    ([a j] {:display ["flex" ]
-                            :justify-content j
-                            :flex-direction "column"
-                            :align-items a}))
+                          :align-items "baseline"})
+                     ([a] {:display ["flex" ]
+                           :justify-content "space-between"
+                           :flex-direction "column"
+                           :align-items a})
+                     ([a j] {:display ["flex" ]
+                             :justify-content j
+                             :flex-direction "column"
+                             :align-items a}))
 
-    :$flex-row (fn
-                 ([]
-                  {:display "flex"
-                   :justify-content "space-between"
-                   :align-items "baseline"})
-                 ([a]
-                  {:display "flex"
-                   :justify-content "space-between"
-                   :align-items a})
-                 ([a j]
-                  {:display "flex"
-                   :justify-content j
-                   :align-items a})
-                 ([a j ac]
-                  {:display "flex"
-                   :justify-content j
-                   :align-items a
-                   :align-content ac }))
+     :$flex-row (fn
+                  ([]
+                   {:display "flex"
+                    :justify-content "space-between"
+                    :align-items "baseline"})
+                  ([a]
+                   {:display "flex"
+                    :justify-content "space-between"
+                    :align-items a})
+                  ([a j]
+                   {:display "flex"
+                    :justify-content j
+                    :align-items a})
+                  ([a j ac]
+                   {:display "flex"
+                    :justify-content j
+                    :align-items a
+                    :align-content ac }))
 
-    :$flex-row-left (fn []
-                      {:display "flex"
-                       :justify-content "flex-start"
-                       :align-items "baseline"})
+     :$flex-row-left (fn []
+                       {:display "flex"
+                        :justify-content "flex-start"
+                        :align-items "baseline"})
 
-    :$center (fn []
-               {:display "flex"
-                :align-items "center"
-                :justify-content "center"
-                :flex-direction "column" } )
+     :$center (fn []
+                {:display "flex"
+                 :align-items "center"
+                 :justify-content "center"
+                 :flex-direction "column" } )
 
-    :$center-block (fn
-                     ([w] {:width (&h w)
-                           :height (&h w)
-                           :min-width (&h w)
-                           :min-height (&h w)
-                           :display "flex"
-                           :align-items "center"
-                           :justify-content "center"
-                           :flex-direction "column" })
-                     ([w h] {:width  (when w (&h w))
-                             :height (when h (&v h))
-                             :display "flex"
-                             :align-items "center"
-                             :justify-content "center"
-                             :flex-direction "column" }))
+     :$center-block (fn
+                      ([w] {:width (&h w)
+                            :height (&h w)
+                            :min-width (&h w)
+                            :min-height (&h w)
+                            :display "flex"
+                            :align-items "center"
+                            :justify-content "center"
+                            :flex-direction "column" })
+                      ([w h] {:width  (when w (&h w))
+                              :height (when h (&v h))
+                              :display "flex"
+                              :align-items "center"
+                              :justify-content "center"
+                              :flex-direction "column" }))
 
 :$box (fn
         ([w] {:display "block"
@@ -325,7 +325,6 @@
 (defn resolve-var [v] (if (var? v) (var-get v) v))
 
 (defn config [{vs :vars cs :colors ms :macros :as opts}]
-  #_(println "Configure " opts)
   (when vs (swap! vars merge (resolve-var vs)))
   (when cs (swap! colors merge (resolve-var cs)))
   (when ms (swap! macros merge (resolve-var ms))))

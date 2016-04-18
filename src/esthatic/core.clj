@@ -11,6 +11,7 @@
             [esthatic.generator :as gen]
             [garden.core :as garden]
             [garden.units :as units]
+            [garden.stylesheet :as gs]
             [clojure.walk :as walk]
             [route-map.core :as rt]
             [markdown.core :as md]))
@@ -25,6 +26,11 @@
   (css/config (let [cfg (:styles opts)] (if (var? cfg) (var-get cfg) cfg)))
   [:style {:type "text/css"}
    (css/css garden-rules)])
+
+(defn media [opts rule garden-rules]
+  (css/config (let [cfg (:styles opts)] (if (var? cfg) (var-get cfg) cfg)))
+  [:style {:type "text/css"}
+   (garden/css (gs/at-media rule garden-rules))])
 
 (def css-s
   {:bootsrtrap "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"})
@@ -56,6 +62,7 @@
 
 (def pre-rules
   {:$style style
+   :$media media
    :$svg svg
    :$md markdown
    :$nav bootstrap/nav
