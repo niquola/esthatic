@@ -114,7 +114,7 @@
 
 (defn start [{routes :routes port :port :as opts}]
   (css/config (:styles opts))
-  (srv/run-server (mk-handler opts) {:port (or port 8080)}))
+  (srv/run-server (mk-handler opts) {:port (or port 9090)}))
 
 (defn generate [config]
   (gen/generate
