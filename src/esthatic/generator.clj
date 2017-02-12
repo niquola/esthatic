@@ -1,5 +1,6 @@
 (ns esthatic.generator
   (:require [clojure.string :as str]
+            [clojure.java.shell :as sh]
             [me.raynes.fs :as fs]))
 
 (defn dump [path res]
@@ -15,11 +16,13 @@
 
 (defn devar [v] (if (var? v) (var-get v) v))
 
-(defn *generate [{path :path params :params} {routes :routes :as config}]
+(defn *generate [{path :path params :params limit :limit :as ups} {routes :es/routes :as config}]
+  (when (< limit 0) (throw (Exception. "ups limit recur")))
+  (println "*" ups)
   (doseq [[k v] (devar routes)]
     (println path k v)
     (cond
-      (= :GET k) (let [uri (str/join "/" path)
+      (= :. k) (let [uri (str/join "/" path)
                        req {:uri uri :request-method k}
                        res (try
                              ((:dispatch config) req)
@@ -32,9 +35,9 @@
                     (println gen)
                     (doseq [pv (gen)]
                       (println "Generate subpage:" path  pv)
-                      (*generate {:path (conj path pv) :params (assoc params k pv)} (assoc config :routes v))))
+                      (*generate {:path (conj path pv) :params (assoc params k pv) :limit (dec limit)} (assoc config :es/routes v))))
       (keyword? k) "nop"
-      :else (*generate {:path (conj path k) :params params} (assoc config :routes v)))))
+      :else (*generate {:path (conj path k) :params params :limit (dec limit)} (assoc config :es/routes v)))))
 
 
 (defn generate [config]
@@ -46,5 +49,7 @@
     ((if (fs/directory? f) fs/copy-dir fs/copy)
      (.getPath f) (str "dist/" (fs/base-name f))))
 
-  (*generate {:path [] :params {}} config)
+  (*generate {:path [] :params {} :limit 100} config)
   (println "Done!"))
+
+

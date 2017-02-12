@@ -12,7 +12,8 @@
    [:head
     [:title "test"]
     [:bs/css]
-    [:fa/css]]
+    [:fa/css]
+    ]
    [:body
     [:css
      [:body

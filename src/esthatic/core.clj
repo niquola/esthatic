@@ -7,7 +7,6 @@
             [esthatic.hiccup :as hiccup]
             [org.httpkit.server :as srv]
             [esthatic.data :as data]
-            [esthatic.bootstrap :as bootstrap]
             [esthatic.generator :as gen]
             [clojure.walk :as walk]
             [route-map.core :as rt]
@@ -26,19 +25,32 @@
 
 (defn dispatch [{params :params uri :uri
                  routes :es/routes :as req}]
-  (if-let [rt (rt/match (str/replace uri #".html$" "") routes)]
-    (let [mws (filterv identity (mapcat :es/mw (or (:parents rt) [])))
-          req (merge (update req :params merge (:params rt)))
+  (if-let [rt (rt/match (str/replace uri #".html$" "") (if (var? routes) (var-get routes) routes))]
+    (let [mws (->> (or (:parents rt) [])
+                   (mapcat :es/mw)
+                   (filterv identity))
+          rt-params (->> (or (:parents rt) [])
+                         (map :es/params)
+                         (filterv identity)
+                         (reduce merge {}))
+          req (merge (update req :params merge (merge (:params rt) rt-params)))
           handler (build-stack (:match rt) mws)]
-      (println (:match rt) mws)
       (handler req))
-    {:body (str uri " not found: " (str/replace uri #".html$" "")  " " (pr-str (if (var? routes) (var-get routes) routes))) :status 404}))
+    (do
+      {:body     (str (str/replace uri #".html$" "") " not found: " )
+       :headers {"Content-Type" "text/html; charset=utf-8"}
+       :status  404})))
 
 (defn mk-handler [opts]
   (-> (fn [req] (dispatch (merge req opts)))
       (rml/wrap-reload)
       (rmr/wrap-resource "assets")
       (rmd/wrap-defaults (merge rmd/site-defaults (merge opts {:security {:anti-forgery false}})))))
+
+(defn href [req path]
+  (if-let [prefix (:es/prefix req)]
+    (str prefix path)
+    path))
 
 
 
@@ -47,4 +59,9 @@
 (defn restart [opts]
   (when-let [s @server] (s) (reset! server nil))
   (reset! server (srv/run-server (mk-handler opts) {:port (or (:port opts) 9090)})))
+
+(defn generate [opts]
+  (gen/generate
+   (assoc opts :dispatch (mk-handler opts))))
+
 

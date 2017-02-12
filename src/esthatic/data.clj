@@ -4,11 +4,12 @@
             [markdown.core :as md]
             [clj-yaml.core :as yaml]))
 
-(defn with-yaml [key path]
+(defn with-yaml [path & keys]
   (fn [h]
     (fn [req]
-      (println "with-yaml")
-      (h (assoc-in req [:data key] (yaml/parse-string (slurp (io/resource path))))))))
+      (if-let [res (io/resource path)]
+        (h (assoc-in req (into [:data] keys) (yaml/parse-string (slurp res))))
+        (throw (Exception. (str "No such resource " path)))))))
 
 
 ;; (defn markdown [str]
