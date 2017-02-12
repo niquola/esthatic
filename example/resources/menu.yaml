@@ -1,0 +1,19 @@
+brand: Esthatic
+moto: Yet another static site <br/> generator for clojurians
+features:
+  - title: Programmable
+    text: hack your static site with libs & maximum flexibility - like a web app
+  - title: "Data Driven"
+    text: "leverage data DSL's like hiccup, garden, datalog & route-map "
+  - title: "Extendable"
+    text: "write plugin is just a several lines of gist"
+  - title: "Simple :0"
+    text: "do it with smallest amount of code, so if ... just inline this project"
+items:
+  - text: Getting Started
+    href: /getting-started
+  - text: Documentation
+    href: /docs
+  - text: Sources
+    icon: github
+    href: https://github.com/niquola/esthatic
