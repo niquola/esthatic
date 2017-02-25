@@ -63,8 +63,12 @@
      (-> r (slurp) (md/md-to-html-string))
      [:b (str "No such file " path " :( ")])])
 
+(defn md-str [r s]
+  (md/md-to-html-string s))
+
 (def markdown-hiccup
-  {:md/doc md-doc})
+  {:md/doc md-doc
+   :md/md md-str})
 
 (defn fa-icon [nm]
   (if (or (string? nm) (keyword? nm))

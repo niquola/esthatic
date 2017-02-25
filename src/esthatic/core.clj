@@ -3,6 +3,7 @@
             [hiccup.page :as hp]
             [ring.middleware.resource :as rmr]
             [ring.middleware.defaults :as rmd]
+            [ring.middleware.stacktrace :as rms]
             [ring.middleware.reload :as rml]
             [esthatic.hiccup :as hiccup]
             [org.httpkit.server :as srv]
@@ -45,6 +46,7 @@
   (-> (fn [req] (dispatch (merge req opts)))
       (rml/wrap-reload)
       (rmr/wrap-resource "assets")
+      (rms/wrap-stacktrace-web)
       (rmd/wrap-defaults (merge rmd/site-defaults (merge opts {:security {:anti-forgery false}})))))
 
 (defn href [req path]
