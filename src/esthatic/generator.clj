@@ -18,7 +18,6 @@
 
 (defn *generate [{path :path params :params limit :limit :as ups} {routes :es/routes :as config}]
   (when (< limit 0) (throw (Exception. "ups limit recur")))
-  (println "*" ups)
   (doseq [[k v] (devar routes)]
     (println path k v)
     (cond
@@ -32,7 +31,6 @@
                    (dump path (:body res)))
       (vector? k) (let [k (first k)
                         gen (get routes k)]
-                    (println gen)
                     (doseq [pv (gen)]
                       (println "Generate subpage:" path  pv)
                       (*generate {:path (conj path pv) :params (assoc params k pv) :limit (dec limit)} (assoc config :es/routes v))))
@@ -42,8 +40,8 @@
 
 (defn generate [config]
   (println "Generating into dist:")
-  (fs/delete-dir "dist")
-  (fs/mkdir "dist")
+  ;; (fs/delete-dir "dist")
+  ;; (fs/mkdir "dist")
   (doseq [f (fs/glob "resources/public/*")]
     (println "assets: " (fs/base-name f))
     ((if (fs/directory? f) fs/copy-dir fs/copy)

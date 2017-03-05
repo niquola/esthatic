@@ -23,7 +23,7 @@
       {:body    (hiccup/html (update req :hiccup/macro merge macro) res)
        :headers {"Content-Type" "text/html; charset=utf-8"}
        :status  200})))
-
+  
 (defn dispatch [{params :params uri :uri
                  routes :es/routes :as req}]
   (if-let [rt (rt/match (str/replace uri #".html$" "") (if (var? routes) (var-get routes) routes))]

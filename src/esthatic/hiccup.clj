@@ -28,7 +28,7 @@
                 hic))
 
 (defn html [req hic]
-  (println "macro" (:hiccup/macro req))
+  ;; (println "macro" (:hiccup/macro req))
   (hiccup/html (pre-process req hic)))
 
 (def yaml-hiccup
